@@ -23,6 +23,24 @@ export const VideoJS = (props) => {
         onReady && onReady(player);
       });
 
+      console.log(player)
+      const Button = videojs.getComponent('Button')
+      console.log(Button)
+      
+      const myButton = new Button(player, {
+        clickHandler: function(event) {
+          videojs.log('clicado bottao')
+        }
+      })
+      myButton.controlText('Fullscreen')
+      myButton.addClass('vjs-visible-text')
+      // myButton.setIcon('play')
+
+      console.log(myButton.el())
+
+      player.getChild('ControlBar').addChild(myButton)
+
+
     // You could update an existing player in the `else` block here
     // on prop change, for example:
     } else {
@@ -45,7 +63,7 @@ export const VideoJS = (props) => {
     };
   }, [playerRef]);
 
-  return (
+  return (    
     <div data-vjs-player style={{ height: '18.75rem',width:'37.5rem' }}>
       <div ref={videoRef} />
     </div>
@@ -82,13 +100,7 @@ const App = () => {
     });
   };
 
-  return (
-    <>
-      <div>Rest of app here</div>
-      <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />
-      <div>Rest of app here</div>
-    </>
-  );
+  return <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />
 }
 
 export default App
