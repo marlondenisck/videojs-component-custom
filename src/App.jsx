@@ -7,6 +7,8 @@ import 'video.js/dist/video-js.css'
 export const VideoJS = (props) => {
   const videoRef = React.useRef(null);
   const playerRef = React.useRef(null);
+  const waterMarkRef = React.useRef(null);
+  
   const {options, onReady} = props
 
   React.useEffect(() => {
@@ -19,25 +21,25 @@ export const VideoJS = (props) => {
       videoRef.current.appendChild(videoElement);
 
       const player = playerRef.current = videojs(videoElement, options, () => {
-        videojs.log('player is ready');
+        // videojs.log('player is ready');
         onReady && onReady(player);
       });
 
-      console.log(player)
       const Button = videojs.getComponent('Button')
-      console.log(Button)
+     
       
       const myButton = new Button(player, {
         clickHandler: function(event) {
           videojs.log('clicado bottao')
+          console.log('event click', event)
+          waterMarkRef.current.requestFullscreen()
         }
       })
       myButton.controlText('Fullscreen')
       myButton.addClass('vjs-visible-text')
       // myButton.setIcon('play')
 
-      console.log(myButton.el())
-
+  
       player.getChild('ControlBar').addChild(myButton)
 
 
@@ -63,10 +65,15 @@ export const VideoJS = (props) => {
     };
   }, [playerRef]);
 
-  return (    
-    <div data-vjs-player style={{ height: '18.75rem',width:'37.5rem' }}>
-      <div ref={videoRef} />
-    </div>
+  return (   
+    <>
+      <div className="watermark" ref={waterMarkRef} >  
+      <div data-vjs-player style={{ height: '18.75rem',width:'37.5rem' }}>
+        <div ref={videoRef} />
+      </div>
+        <p style={{ position: 'absolute' }}>watermark</p>
+      </div> 
+    </>
   );
 }
 
