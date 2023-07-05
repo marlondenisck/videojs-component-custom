@@ -4,6 +4,89 @@ import './App.css'
 import videojs from 'video.js'
 import 'video.js/dist/video-js.css'
 
+
+var MenuButton = videojs.getComponent("MenuButton");
+var MenuItem = videojs.getComponent("MenuItem");
+const Button = videojs.getComponent('Button')
+
+// New syntax
+class CustomMenuButton extends Button {
+
+    /**
+     * Creates an instance of this class.
+     *
+     * @param { import('./player').default } player
+     *        The `Player` that this class should be attached to.
+     *
+     * @param {Object} [options]
+     *        The key/value store of player options.
+     */
+    constructor(player, options) {
+      super(player, options);
+      // this.setIcon('fullscreen-enter');
+      this.on(player, 'fullscreenchange', (e) => this.handleFullscreenChange(e));
+  
+      if (document[player.fsApi_.fullscreenEnabled] === false) {
+        this.disable();
+      }
+    }
+  
+    /**
+     * Builds the default DOM `className`.
+     *
+     * @return {string}
+     *         The DOM `className` for this object.
+     */
+    buildCSSClass() {
+      return `vjs-fullscreen-control ${super.buildCSSClass()}`;
+    }
+  
+    /**
+     * Handles fullscreenchange on the player and change control text accordingly.
+     *
+     * @param {Event} [event]
+     *        The {@link Player#fullscreenchange} event that caused this function to be
+     *        called.
+     *
+     * @listens Player#fullscreenchange
+     */
+    handleFullscreenChange(event) {
+      if (this.player_.isFullscreen()) {
+        this.controlText('Exit Fullscreen');
+        // this.setIcon('fullscreen-exit');
+      } else {
+        this.controlText('Fullscreen');
+        // this.setIcon('fullscreen-enter');
+      }
+    }
+  
+    /**
+     * This gets called when an `FullscreenToggle` is "clicked". See
+     * {@link ClickableComponent} for more detailed information on what a click can be.
+     *
+     * @param {Event} [event]
+     *        The `keydown`, `tap`, or `click` event that caused this function to be
+     *        called.
+     *
+     * @listens tap
+     * @listens click
+     */
+    handleClick(event) {
+      console.log('ae porra', event)
+      const player = document.getElementById('watermark')
+      const playerIsfullScreen = player.getAttributeNode('isfullscreen')
+     console.log(playerIsfullScreen)
+      if (!playerIsfullScreen || !playerIsfullScreen.isFullscreen()) {
+        player.requestFullscreen();
+        player.setAttribute('isfullscreen')
+      } else {
+        player.exitFullscreen();
+      }
+    }
+  
+  }
+
+
 export const VideoJS = (props) => {
   const videoRef = React.useRef(null);
   const playerRef = React.useRef(null);
@@ -43,6 +126,17 @@ export const VideoJS = (props) => {
       player.getChild('ControlBar').addChild(myButton)
 
 
+   // Register as a component, so it can be added
+videojs.registerComponent("CustomMenuButton", CustomMenuButton);
+
+// Use `addChild` to add an instance of the new component, with options
+player.controlBar.addChild("CustomMenuButton", {
+  controlText: "My Awesome Menu", //It shows a text when the menu is hovered
+  title: "My menu",
+  myItems: [{ name: "Hello" }, { name: "World" }],
+});
+
+
     // You could update an existing player in the `else` block here
     // on prop change, for example:
     } else {
@@ -67,7 +161,7 @@ export const VideoJS = (props) => {
 
   return (   
     <>
-      <div className="watermark" ref={waterMarkRef} >  
+      <div className="watermark" ref={waterMarkRef} id='watermark' >  
       <div data-vjs-player style={{ height: '18.75rem',width:'37.5rem' }}>
         <div ref={videoRef} />
       </div>
